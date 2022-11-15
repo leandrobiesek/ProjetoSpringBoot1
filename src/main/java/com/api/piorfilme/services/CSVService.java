@@ -1,16 +1,12 @@
 package com.api.piorfilme.services;
 
 import com.api.piorfilme.models.*;
-import com.api.piorfilme.repositories.MovieRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ResourceUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -87,49 +83,48 @@ public class CSVService {
 
     public List<MovieModel> loadResourceCSV(String csvName) {
 
-        try {
-            File file = ResourceUtils.getFile("classpath:"+csvName);
+        try (BufferedReader fileReader = new BufferedReader(
+                new InputStreamReader(
+                        ResourceLoader.class.getResourceAsStream("/"+csvName)
+                )
+            );
 
-            try (BufferedReader fileReader = new BufferedReader(new FileReader(file));
+            CSVParser csvParser = new CSVParser(fileReader,
+                     CSVFormat.DEFAULT
+                             .withFirstRecordAsHeader()
+                             .withIgnoreHeaderCase()
+                             .withDelimiter(';')
+                             .withTrim());
+             ) {
 
-                 CSVParser csvParser = new CSVParser(fileReader,
-                         CSVFormat.DEFAULT
-                                 .withFirstRecordAsHeader()
-                                 .withIgnoreHeaderCase()
-                                 .withDelimiter(';')
-                                 .withTrim());
-                 ) {
+            List<CSVRecord> csvRecords = csvParser.getRecords();
+            List<MovieModel> movieModelList = new ArrayList<>();
+            List<ProducerModel> producerModelListRead = new ArrayList<>();
+            List<ProducerMovieModel> producerMovieModelList = new ArrayList<>();
+            List<StudioModel> studioModelListRead = new ArrayList<>();
+            List<StudioMovieModel> studioMovieModelList = new ArrayList<>();
+            MovieModel movie;
+            for (CSVRecord csvRecord : csvRecords) {
+                movie = new MovieModel(Long.parseLong(csvRecord.get(0)), csvRecord.get(1), csvRecord.get(4));
 
-                List<CSVRecord> csvRecords = csvParser.getRecords();
-                List<MovieModel> movieModelList = new ArrayList<>();
-                List<ProducerModel> producerModelListRead = new ArrayList<>();
-                List<ProducerMovieModel> producerMovieModelList = new ArrayList<>();
-                List<StudioModel> studioModelListRead = new ArrayList<>();
-                List<StudioMovieModel> studioMovieModelList = new ArrayList<>();
-                MovieModel movie;
-                for (CSVRecord csvRecord : csvRecords) {
-                    movie = new MovieModel(Long.parseLong(csvRecord.get(0)), csvRecord.get(1), csvRecord.get(4));
-
-                    //cria as relações entre o filme e os produtores
-                    for (ProducerModel producer : this.processRecordProducers(producerModelListRead, csvRecord.get(3))) {
-                        movie.getProducerMovieModelList().add(new ProducerMovieModel(movie, producer));
-                    }
-
-                    //cria as relações entre o filme e os estúdios
-                    for (StudioModel studio : this.processRecordStudios(studioModelListRead, csvRecord.get(2))) {
-                        movie.getStudioMovieModelList().add(new StudioMovieModel(movie, studio));
-                    }
-                    movieModelList.add(movie);
+                //cria as relações entre o filme e os produtores
+                for (ProducerModel producer : this.processRecordProducers(producerModelListRead, csvRecord.get(3))) {
+                    movie.getProducerMovieModelList().add(new ProducerMovieModel(movie, producer));
                 }
 
-                return movieModelList;
-
-            } catch (IOException e) {
-                throw new RuntimeException("Falha ao ler o arquivo CSV: " + e.getMessage());
+                //cria as relações entre o filme e os estúdios
+                for (StudioModel studio : this.processRecordStudios(studioModelListRead, csvRecord.get(2))) {
+                    movie.getStudioMovieModelList().add(new StudioMovieModel(movie, studio));
+                }
+                movieModelList.add(movie);
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Arquivo CSV não encontrado: " + e.getMessage());
+
+            return movieModelList;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Falha ao ler o arquivo CSV: " + e.getMessage());
         }
+
     }
 
     @Transactional
