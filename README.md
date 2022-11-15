@@ -58,3 +58,32 @@ Após isso o arquivo .JAR estará criado e poderá ser executado a partir da rai
 através do comando
 
 `java -jar target/piorfilme-0.0.1-SNAPSHOT.jar`
+
+# API REST
+
+## Intervalo de prêmios
+
+### Request
+`GET /`
+
+### Response
+```
+{
+    "min: [
+        {
+            "producer":"Joel Silver",
+            "interval":1,
+            "previousWin":1990,
+            "followingWin":1991
+        }
+    ],
+    "max": [
+        {
+            "producer":"Matthew Vaughn",
+            "interval":13,
+            "previousWin":2002,
+            "followingWin":2015
+        }
+    ]
+}
+```
