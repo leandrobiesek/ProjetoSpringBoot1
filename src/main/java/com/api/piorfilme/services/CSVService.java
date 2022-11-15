@@ -88,7 +88,7 @@ public class CSVService {
     public List<MovieModel> loadResourceCSV(String csvName) {
 
         try {
-            File file = ResourceUtils.getFile("classpath:static/"+csvName);
+            File file = ResourceUtils.getFile("classpath:"+csvName);
 
             try (BufferedReader fileReader = new BufferedReader(new FileReader(file));
 
