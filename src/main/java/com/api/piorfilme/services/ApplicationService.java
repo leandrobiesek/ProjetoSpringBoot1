@@ -28,19 +28,14 @@ public class ApplicationService {
 
         for (var producerAndYears: winnerProducersAndYears.entrySet()) {
 
-            //Busca os anos dos menores e dos maiores intervalos
-            maxPrevYear = producerAndYears.getValue().get(0);
-            maxFollowYear = producerAndYears.getValue().get(1);
-            minPrevYear = producerAndYears.getValue().get(0);
-            minFollowYear = producerAndYears.getValue().get(1);
-
-
             for (int i = 0; i < producerAndYears.getValue().size() - 1; i++) {
                 minPrevYear = producerAndYears.getValue().get(i);
                 minFollowYear = producerAndYears.getValue().get(i + 1);
+                maxPrevYear = producerAndYears.getValue().get(i);
+                maxFollowYear = producerAndYears.getValue().get(i + 1);
+                //Busca o menor intervalo
                 if (returnDTO.getMin().size() == 0) {
                     this.insertIntoList(returnDTO.getMin(), producerAndYears.getKey(), minPrevYear, minFollowYear);
-                    continue;
                 } else {
                     if (returnDTO.getMin().get(0).getInterval() >= (minFollowYear - minPrevYear)) {
 
@@ -51,14 +46,10 @@ public class ApplicationService {
 
                     }
                 }
-            }
 
-            for (int i = 0; i < producerAndYears.getValue().size() - 1; i++) {
-                maxPrevYear = producerAndYears.getValue().get(i);
-                maxFollowYear = producerAndYears.getValue().get(i + 1);
+                // Busca o maior intervalo
                 if (returnDTO.getMax().size() == 0) {
                     this.insertIntoList(returnDTO.getMax(), producerAndYears.getKey(), maxPrevYear, maxFollowYear);
-                    continue;
                 } else {
                     if (returnDTO.getMax().get(0).getInterval() <= (maxFollowYear - maxPrevYear)) {
                         if (returnDTO.getMax().get(0).getInterval() < (maxFollowYear - maxPrevYear)) {
@@ -68,6 +59,7 @@ public class ApplicationService {
                     }
                 }
             }
+
         }
         return returnDTO;
     }
