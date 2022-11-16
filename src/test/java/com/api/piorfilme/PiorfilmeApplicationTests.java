@@ -38,6 +38,7 @@ class PiorfilmeApplicationTests {
 
 		//Adiciona os valores esperados para o(s) produtor(es) vencedor(res) com maior intervalo
 		this.apiReturnDTO.getMax().add(new PrizeIntervalDTO("Matthew Vaughn", 13L, 2002L, 2015L));
+		this.apiReturnDTO.getMax().add(new PrizeIntervalDTO("Matthew Vaughn", 13L, 2015L, 2028L));
 	}
 
 	@Test

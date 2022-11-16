@@ -12,7 +12,6 @@ public class PiorfilmeApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PiorfilmeApplication.class, args);
-		//coloco aqui o codigo de leitura do CSV?
 	}
 
 }
